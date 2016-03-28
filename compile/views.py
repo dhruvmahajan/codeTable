@@ -10,11 +10,10 @@ Languages = [
 				('PYTHON', 'PYTHON'),
 			]
 
-
 class EditorForm(forms.Form):
     sourceCode = forms.CharField( widget=forms.Textarea(attrs={'cols': 150, 'rows': 20}))
     lang = forms.ChoiceField(choices=Languages)
-    customInput = forms.CharField( widget=forms.Textarea(attrs={'cols': 50, 'rows': 20}))
+    customInput = forms.CharField( widget=forms.Textarea(attrs={'cols': 50, 'rows': 20}), required=False)
 
 
 def runCode(request, run_id):
@@ -31,8 +30,6 @@ def runCode(request, run_id):
 		RUN_URL = u'https://api.hackerearth.com/v3/code/run/'
 		CLIENT_SECRET = '66cbe706e0538bc8599cd99f3825ee74f6c02d38'
 
-		source = "print'Hello World'"
-
 		data = {
 		    'client_secret': CLIENT_SECRET,
 		    'async': 0,
@@ -46,12 +43,18 @@ def runCode(request, run_id):
 		r = requests.post(RUN_URL, data=data)
 		resultJson = r.json()
 		print(resultJson)
-		print(resultJson['code_id'])
+		
+		
+		context = { "form": form, "output": resultJson['run_status']['output']  }
+
+		return render(request, "code.html", context)
+
 	#---------------------HE_API ends------------------------------------------
 
 	context = { "form": form,   }
 
 	return render(request, "code.html", context)
+
 
 
 

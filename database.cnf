@@ -1,0 +1,5 @@
+[client]
+database='codetable'
+user='root'
+password='dhruv'
+default-character-set=utf8

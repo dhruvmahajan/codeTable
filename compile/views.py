@@ -16,7 +16,7 @@ Languages = [
 class CodeTableForm(forms.Form):
     sourceCode = forms.CharField( widget=forms.Textarea(attrs={'cols': 150, 'rows': 20}))
     lang = forms.ChoiceField(choices=Languages)
-    customInput = forms.CharField( widget=forms.Textarea(attrs={'cols': 50, 'rows': 20}), required=False)
+    customInput = forms.CharField( widget=forms.Textarea(attrs={'cols': 80, 'rows': 5}), required=False)
 
 
 def he_api(sourceCode, lang, customInput):
@@ -83,7 +83,7 @@ def runNewCode(request):
 	return render(request, "code.html", context)
 
 
-def runCode(request, run_id):
+def runOldCode(request, run_id):
 
 	print('runCode before submit')
 	try:
@@ -104,7 +104,17 @@ def runCode(request, run_id):
 		return render(request, "code.html", context)
 
 
-	context = { "form": form, "output":q.output_html  }
+	context = { "form": form, 
+				"output":q.output,
+				"time":q.time_used,
+				"memory":q.memory_used,
+				"status":q.status,
+				"status_detail":q.status_detail,
+				"compile_status":q.compile_status,
+				"compiled_on":q.compiled_on,
+				"stderr":q.stderr,
+
+				}
 
 	return render(request, "code.html", context)
 

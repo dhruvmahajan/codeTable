@@ -1,22 +1,22 @@
 <h3>Code Table</h3>
 
 <form method='POST' action = ''>{% csrf_token%}
-Source Code<br>
-{{form.sourceCode}}
-<br><br><br>
-{%  if output %}
-<h5>Output</h5>
-<div class="out"><pre style="font-size:17px;  border:1px dashed">{{output}}</pre></div> 
-{% endif %} 
-<br><br>
-Language<br>
-{{form.lang}}
-<br><br>
-Custom Input<br>
-{{form.customInput}}
-<br>
-<br><br>
-                               
-<input type='submit' value='Submit' />
+    Source Code<br>
+    {{form.sourceCode}}
+    <br><br><br>
+    {%  if output %}
+        <h5>Output</h5>
+        <div class="out"><pre style="font-size:17px;  border:1px dashed">{{output}}</pre></div> 
+    {% endif %} 
+    <br><br>
+    Language<br>
+    {{form.lang}}
+    <br><br>
+    Custom Input<br>
+    {{form.customInput}}
+    <br>
+    <br><br>
+                                   
+    <input type='submit' value='Submit' />
 
 </form>

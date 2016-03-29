@@ -5,6 +5,8 @@ from django_ace import AceWidget
 
 from compile.models import Code
 
+from django.core.exceptions import ObjectDoesNotExist
+
 Languages = [
 				('C', 'C'),
 				('CPP', 'CPP'),
@@ -84,7 +86,13 @@ def runNewCode(request):
 def runCode(request, run_id):
 
 	print('runCode before submit')
-	form = CodeTableForm(request.POST or None)
+	try:
+		q = Code.objects.get(pk=run_id)
+	except ObjectDoesNotExist:
+		return HttpResponseRedirect('/code/')
+
+	form = CodeTableForm(request.POST or None, initial={'sourceCode':q.source_code, 'lang':	q.lang, 'customInput':q.user_input})
+
 	if form.is_valid():
 		print('runCode after submit')
 
@@ -96,7 +104,7 @@ def runCode(request, run_id):
 		return render(request, "code.html", context)
 
 
-	context = { "form": form,   }
+	context = { "form": form, "output":q.output_html  }
 
 	return render(request, "code.html", context)
 

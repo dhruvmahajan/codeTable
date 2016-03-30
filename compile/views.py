@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django import forms
 from django_ace import AceWidget
-
+	
 from compile.models import Code
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -35,14 +35,14 @@ def he_api(sourceCode, lang, customInput):
 	return resultJson
 
 
-def runNewCode(request):
-	# print('new run before submit')
-	form = CodeTableForm(request.POST or None)
-	if form.is_valid():
-		# print('new run after submit')
+def runNewCode(request, run_id=None, form=None):
+	
+	if form==None:
+		form = CodeTableForm(request.POST or None)
+ 
 
-		
-
+	if form.is_valid() or run_id!=None:
+				
 		sourceCode = form.cleaned_data.get('sourceCode')
 		lang = form.cleaned_data.get('lang')
 		customInput = form.cleaned_data.get('customInput')
@@ -50,9 +50,14 @@ def runNewCode(request):
 		# calling he_api
 
 		resultJson = he_api(sourceCode, lang, customInput)
+		
 		print(resultJson)
 
-		run_id = resultJson['code_id']
+		# if new run then we have to asign new run_id for it
+
+		if run_id==None:
+			run_id = resultJson['code_id']
+
 		compileStatus = resultJson['compile_status']
 		status = resultJson['run_status']['status']
 		statusDetail = resultJson['run_status']['status_detail']
@@ -90,7 +95,7 @@ def runNewCode(request):
 			C.save()
 
 		context = { "form": form, 'run_id': run_id }
-		return HttpResponseRedirect(run_id+'/')
+		return HttpResponseRedirect('/'+run_id)
 
 	context = { "form": form, 
 	
@@ -99,15 +104,20 @@ def runNewCode(request):
 	return render(request, "code.html", context)
 
 
-def viewOldCode(request, run_id):
+def runOldCode(request, run_id):
 
-	# print('runCode before submit')
 	try:
 		q = Code.objects.get(pk=run_id)
 	except ObjectDoesNotExist:
 		return HttpResponseRedirect('/')
 
 	form = CodeTableForm(request.POST or None, initial={'sourceCode':q.source_code, 'lang':	q.lang, 'customInput':q.user_input})
+
+	if form.is_valid():
+		q.delete()
+		runNewCode(None, run_id, form)
+		return HttpResponseRedirect('/'+run_id)
+
 
 	context = { "form": form, 
 				"output":q.output,

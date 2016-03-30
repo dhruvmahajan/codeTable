@@ -77,9 +77,13 @@
     <br>
     <br><br>
     
-    
+    {% if readOnly %}       
+        **This is Read Only, Clone to edit**               
+       
+    {% else %}
          <input type='submit' value='Submit' />
 
+    {% endif %}
 </form>
 
 

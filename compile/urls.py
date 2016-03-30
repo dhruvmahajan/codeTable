@@ -3,5 +3,5 @@ from django.conf.urls import url
 urlpatterns = [
    
     url(r'^$', 'compile.views.runNewCode', name='newCode'),
-    url(r'^(?P<run_id>[\w]+)/$', 'compile.views.runOldCode', name='code'),
+    url(r'^(?P<run_id>[\w]+)/$', 'compile.views.viewOldCode', name='code'),
 ]

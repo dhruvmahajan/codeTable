@@ -1,3 +1,4 @@
+
 <h3>Code Table</h3>
 
 <form method='POST' action = ''>{% csrf_token%}
@@ -55,8 +56,17 @@
             <div class="less-margin body-font dark"> {{status_detail}}
             </div>
         </div>
-        <div class="clear"></div>
     {% endif %}    
+
+
+    {% if compiled_on %}
+        <div class="float-left col">
+            <div class="content-heading-bold"> <b>Compiled On</b>
+            </div>
+            <div class="less-margin body-font dark"> {{compiled_on}}
+            </div>
+        </div>
+    {% endif %} 
 
     <br><br>
     Language<br>
@@ -66,8 +76,9 @@
     {{form.customInput}}
     <br>
     <br><br>
-                                   
-    <input type='submit' value='Submit' />
+    
+    
+         <input type='submit' value='Submit' />
 
 </form>
 

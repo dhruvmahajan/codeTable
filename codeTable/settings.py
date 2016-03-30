@@ -85,6 +85,20 @@ DATABASES = {
     }
 }
 
+# Hacker Earth API KEY
+
+RUN_URL = u'https://api.hackerearth.com/v3/code/run/'
+CLIENT_SECRET = '66cbe706e0538bc8599cd99f3825ee74f6c02d38'
+
+
+# Allowed Languages
+
+LANG_CHOICES = [
+                ('C', 'C'),
+                ('CPP', 'CPP'),
+                ('PYTHON', 'PYTHON'),
+            ]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

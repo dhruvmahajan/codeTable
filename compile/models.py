@@ -1,17 +1,12 @@
 from django.db import models
-
+from django.conf import settings
 # Create your models here.
 
-LANG_CHOICES = [
-				('C', 'C'),
-				('CPP', 'CPP'),
-				('PYTHON', 'PYTHON'),
-			]
 
 class Code(models.Model):
 	code_id = models.CharField(max_length=20, primary_key=True)
 	source_code = models.TextField()
-	lang = models.CharField(choices=LANG_CHOICES, max_length=20, default='C')
+	lang = models.CharField(choices=settings.LANG_CHOICES, max_length=20, default='C')
 	compiled_on = models.DateTimeField(auto_now_add=True)
 	last_saved_on = models.DateTimeField(auto_now=True, null=True)
 	compile_status = models.TextField(null=True)

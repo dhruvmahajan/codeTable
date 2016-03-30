@@ -7,15 +7,12 @@ from compile.models import Code
 
 from django.core.exceptions import ObjectDoesNotExist
 
-Languages = [
-				('C', 'C'),
-				('CPP', 'CPP'),
-				('PYTHON', 'PYTHON'),
-			]
+from django.conf import settings
+
 
 class CodeTableForm(forms.Form):
-    sourceCode = forms.CharField( widget=forms.Textarea(attrs={'cols': 150, 'rows': 20}))
-    lang = forms.ChoiceField(choices=Languages)
+    sourceCode = forms.CharField( widget=forms.Textarea(attrs={'cols': 100, 'rows': 20}))
+    lang = forms.ChoiceField(choices=settings.LANG_CHOICES)
     customInput = forms.CharField( widget=forms.Textarea(attrs={'cols': 80, 'rows': 5}), required=False)
 
 
@@ -23,12 +20,8 @@ def he_api(sourceCode, lang, customInput):
 
 	import requests
 
-	# constants
-	RUN_URL = u'https://api.hackerearth.com/v3/code/run/'
-	CLIENT_SECRET = '66cbe706e0538bc8599cd99f3825ee74f6c02d38'
-
 	data = {
-	    'client_secret': CLIENT_SECRET,
+	    'client_secret': settings.CLIENT_SECRET,
 	    'async': 0,
 	    'source': sourceCode,
 	    'lang': lang,
@@ -37,22 +30,24 @@ def he_api(sourceCode, lang, customInput):
 	    'memory_limit': 262144,
 	}
 
-	r = requests.post(RUN_URL, data=data)
+	r = requests.post(settings.RUN_URL, data=data)
 	resultJson = r.json()
 	return resultJson
 
 
 def runNewCode(request):
-	print('new run before submit')
+	# print('new run before submit')
 	form = CodeTableForm(request.POST or None)
 	if form.is_valid():
-		print('new run after submit')
+		# print('new run after submit')
 
-		# calling he_api
+		
 
 		sourceCode = form.cleaned_data.get('sourceCode')
 		lang = form.cleaned_data.get('lang')
 		customInput = form.cleaned_data.get('customInput')
+
+		# calling he_api
 
 		resultJson = he_api(sourceCode, lang, customInput)
 		print(resultJson)
@@ -69,40 +64,50 @@ def runNewCode(request):
 			outputHtml = resultJson['run_status']['output_html']
 			stderr = resultJson['run_status']['stderr']
 
-			C = Code(code_id=run_id, source_code=sourceCode, lang=lang, compile_status=compileStatus, time_used=timeUsed,memory_used=memoryUsed, status=status, status_detail=statusDetail, user_input=customInput, output=output, output_html=outputHtml, stderr=stderr) 
+			C = Code(code_id=run_id,
+					source_code=sourceCode,
+					lang=lang,
+					compile_status=compileStatus,
+					time_used=timeUsed,
+					memory_used=memoryUsed,
+					status=status,
+					status_detail=statusDetail,
+					user_input=customInput,
+					output=output,
+					output_html=outputHtml,
+					stderr=stderr
+				) 
 			C.save()
 		else:
-			C = Code(code_id=run_id, source_code=sourceCode, lang=lang, compile_status=compileStatus, status=status, status_detail=statusDetail, user_input=customInput) 
+			C = Code(code_id=run_id,
+					source_code=sourceCode,
+					lang=lang,
+					compile_status=compileStatus,
+					status=status,
+					status_detail=statusDetail,
+					user_input=customInput
+				) 
 			C.save()
 
 		context = { "form": form, 'run_id': run_id }
 		return HttpResponseRedirect(run_id+'/')
 
-	context = { "form": form,   }
+	context = { "form": form, 
+	
+			  }
 
 	return render(request, "code.html", context)
 
 
-def runOldCode(request, run_id):
+def viewOldCode(request, run_id):
 
-	print('runCode before submit')
+	# print('runCode before submit')
 	try:
 		q = Code.objects.get(pk=run_id)
 	except ObjectDoesNotExist:
-		return HttpResponseRedirect('/code/')
+		return HttpResponseRedirect('/')
 
 	form = CodeTableForm(request.POST or None, initial={'sourceCode':q.source_code, 'lang':	q.lang, 'customInput':q.user_input})
-
-	if form.is_valid():
-		print('runCode after submit')
-
-		resultJson = he_api(form.cleaned_data.get('sourceCode'), form.cleaned_data.get('lang'), form.cleaned_data.get('customInput') )
-		print(resultJson)
-
-		context = { "form": form, "output": resultJson['run_status']['output'], 'run_id':run_id  }
-
-		return render(request, "code.html", context)
-
 
 	context = { "form": form, 
 				"output":q.output,
@@ -113,7 +118,7 @@ def runOldCode(request, run_id):
 				"compile_status":q.compile_status,
 				"compiled_on":q.compiled_on,
 				"stderr":q.stderr,
-
+								
 				}
 
 	return render(request, "code.html", context)
